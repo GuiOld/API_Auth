@@ -29,3 +29,51 @@ exports.login = async (req, res) => {
     res.status(500).json(err);
   }
 };
+
+exports.obterUsuario = async (req, res) => {
+  try {
+    const usuario = await Usuario.findById(req.usuarioId).select('nome email');
+    if (!usuario) return res.status(404).json({ mensagem: 'Usuário não encontrado' });
+    res.json(usuario);
+  } catch (err) {
+    res.status(500).json({ mensagem: 'Erro ao obter dados do usuário' });
+  }
+};
+
+exports.atualizarUsuario = async (req, res) => {
+  try {
+    const { nome, email, senha } = req.body;
+    const updateData = { nome, email };
+
+    if (senha) {
+      updateData.senhaHash = bcrypt.hashSync(senha, 10);
+    }
+
+    const usuarioAtualizado = await Usuario.findByIdAndUpdate(
+      req.usuarioId,
+      updateData,
+      { new: true, select: 'nome email' }
+    );
+
+    if (!usuarioAtualizado) {
+      return res.status(404).json({ mensagem: 'Usuário não encontrado' });
+    }
+
+    res.json({ mensagem: 'Usuário atualizado com sucesso', usuario: usuarioAtualizado });
+  } catch (err) {
+    res.status(500).json({ mensagem: 'Erro ao atualizar usuário' });
+  }
+};
+
+exports.deletarUsuario = async (req, res) => {
+  try {
+    const resultado = await Usuario.findByIdAndDelete(req.usuarioId);
+    if (!resultado) {
+      return res.status(404).json({ mensagem: 'Usuário não encontrado' });
+    }
+
+    res.json({ mensagem: 'Usuário deletado com sucesso' });
+  } catch (err) {
+    res.status(500).json({ mensagem: 'Erro ao deletar usuário' });
+  }
+};
