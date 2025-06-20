@@ -13,7 +13,7 @@ const contatoRoutes = require('./routes/contatoRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({origin:'*'}));
 app.use('/usuarios', usuarioRoutes);
 app.use('/contatos', contatoRoutes);
 app.use('/upload', uploadRoutes);
